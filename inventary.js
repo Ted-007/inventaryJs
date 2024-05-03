@@ -5,6 +5,22 @@ class Pila {
         this.lista = [];
         this.type = types;
     }
+    getOrden() {
+        console.log(`Orden de ${this.type} generada: `);
+        console.log("___________________________________");
+        let numProducto = 0;
+        for (let i = 0; i < this.lista.length; i++) {
+            const s = this.lista[i];
+            numProducto++;
+            console.log("producto nro: " + numProducto);
+            console.log("*********************\n" +
+                "Nombre:" + s[2] + "\n" +
+                "Referencia:" + s[0] + "\n" +
+                "Cantidad:" + s[1] + "\n" +
+                "**********************\n");
+        }
+        console.log("___________________________________");
+    }
 
     addProduct(nombre, referencia, cantidad) {
         if (this.tope < this.size) {
@@ -29,7 +45,7 @@ class Pila {
             console.log(`No existen Facturas de ${this.type} a Ejecutar`);
         } else {
             if (cantidad !== null) {
-                this.lista = this.lista.filter(product => !product[0].equalsIgnoreCase(referencia));
+                this.lista = this.lista.filter(product => !product[0] == referencia);
             } else {
                 this.procesar(this.lista, referencia, cantidad);
             }
@@ -40,7 +56,7 @@ class Pila {
 
     procesar(lista, referencia, cantidad) {
         return lista.map(product => {
-            if (product[0].equalsIgnoreCase(referencia)) {
+            if (product[0] == referencia) {
                 product[1] = cantidad;
                 return "Elemento procesado";
             }
@@ -52,9 +68,6 @@ class Pila {
         return this.tope === 0;
     }
 
-    getOrden() {
-        console.log("Abstract method. Must be implemented in child class.");
-    }
 }
 
 class Product {
@@ -77,46 +90,12 @@ class PilaVentas extends Pila {
     constructor(s) {
         super(s, "Ventas");
     }
-
-    getOrden() {
-        console.log("Factura de venta generada: ");
-        console.log("___________________________________");
-        let numProducto = 0;
-        for (let i = 0; i < this.top; i++) {
-            const s = this.lista[i];
-            numProducto++;
-            console.log("producto nro: " + numProducto);
-            console.log("*********************\n" +
-                "Nombre:" + s[2] + "\n" +
-                "Referencia:" + s[0] + "\n" +
-                "Cantidad:" + s[1] + "\n" +
-                "**********************\n");
-        }
-        console.log("___________________________________");
-    }
 }
 
 
 class PilaCompras extends Pila {
     constructor(s) {
         super(s, "Compras");
-    }
-
-    getOrden() {
-        console.log("Orden de compra generada: ");
-        console.log("___________________________________");
-        let numProducto = 0;
-        for (let i = 0; i < this.top; i++) {
-            const s = this.lista[i];
-            numProducto++;
-            console.log("producto nro: " + numProducto);
-            console.log("*********************\n" +
-                "Nombre:" + s[2] + "\n" +
-                "Referencia:" + s[0] + "\n" +
-                "Cantidad:" + s[1] + "\n" +
-                "**********************\n");
-        }
-        console.log("___________________________________");
     }
 }
 
@@ -197,7 +176,7 @@ class Main {
             let product = scanner.question("\nIngrese la referencia del producto: ");
             let count = scanner.question("\nIngrese la cantidad del producto: ");
             if (opcSellorBuild === "1") {
-                if (pila.getType() === "Compras") {
+                if (pila.type === "Compras") {
                     let name = scanner.question("\nIngrese el nombre del producto: ");
                     pila.addProduct(name, product, count);
                 } else {
@@ -227,19 +206,19 @@ class Main {
             for (const s of pila.lista) {
                 let addProduct = true;
                 for (const product of products) {
-                    if (product.getReferencia() === s[0]) {
+                    if (product.referencia === s[0]) {
                         addProduct = false;
-                        if (pila.getType() === "Compras") {
-                            product.setCantidad(product.getCantidad() + parseInt(s[1]));
+                        if (pila.type === "Compras") {
+                            product.cantidad= product.cantidad + parseInt(s[1]);
                             console.log("\nStock actulizado con una compra");
                         } else {
-                            product.setCantidad(product.getCantidad() - parseInt(s[1]));
+                            product.cantidad = product.cantidad - parseInt(s[1]);
                             console.log("\nStock actulizado con una venta");
                         }
                         break;
                     }
                 }
-                if (addProduct && pila.getType() === "Compras") {
+                if (addProduct && pila.type === "Compras") {
                     products.push(new Product(s[2], s[0], parseInt(s[1])));
                 }
             }
@@ -247,10 +226,10 @@ class Main {
     }
 
     static validateExistProduct(products, count, product) {
-        const allowCount = products.filter(product1 => product1.getReferencia().equalsIgnoreCase(product));
+        const allowCount = products.filter(product1 => product1.referencia == product);
         const productExists = allowCount.find(product1 => product1 !== undefined);
         if (productExists) {
-            if (productExists.getCantidad() > parseInt(count)) {
+            if (productExists.cantidad > parseInt(count)) {
                 console.log("\nproducto procesado");
             } else {
                 console.log("\nCantidad no disponible");
